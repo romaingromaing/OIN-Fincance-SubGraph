@@ -1,4 +1,356 @@
-type Log @entity {
+type Poke @entity {
+  id: ID!
+  blockTime: BigInt
+  blockHeight: BigInt
+  blockHash: String
+  predecessorId: String
+  receiverId: String
+  signerId: String
+  signerPublicKey: String
+  gasBurned: BigInt
+  tokensBurned: BigInt
+  outcomeId: String
+  executorId: String
+  outcomeBlockHash: String
+  log: String
+  # above here are standard field properties, add custom ones below
+  accountId: String
+  did: String
+  registered: BigInt
+  owner: String
+}
+
+type FtTransferCall @entity {
+  id: ID!
+  blockTime: BigInt
+  blockHeight: BigInt
+  blockHash: String
+  predecessorId: String
+  receiverId: String
+  signerId: String
+  signerPublicKey: String
+  gasBurned: BigInt
+  tokensBurned: BigInt
+  outcomeId: String
+  executorId: String
+  outcomeBlockHash: String
+  log: String
+  # above here are standard field properties, add custom ones below
+  accountId: String
+  did: String
+  registered: BigInt
+  owner: String
+}
+
+type MintCoin @entity {
+  id: ID!
+  blockTime: BigInt
+  blockHeight: BigInt
+  blockHash: String
+  predecessorId: String
+  receiverId: String
+  signerId: String
+  signerPublicKey: String
+  gasBurned: BigInt
+  tokensBurned: BigInt
+  outcomeId: String
+  executorId: String
+  outcomeBlockHash: String
+  log: String
+  # above here are standard field properties, add custom ones below
+  accountId: String
+  did: String
+  registered: BigInt
+  owner: String
+}
+
+type FtTransfer @entity {
+  id: ID!
+  blockTime: BigInt
+  blockHeight: BigInt
+  blockHash: String
+  predecessorId: String
+  receiverId: String
+  signerId: String
+  signerPublicKey: String
+  gasBurned: BigInt
+  tokensBurned: BigInt
+  outcomeId: String
+  executorId: String
+  outcomeBlockHash: String
+  log: String
+  # above here are standard field properties, add custom ones below
+  accountId: String
+  did: String
+  registered: BigInt
+  owner: String
+}
+
+type OnMintTransfer @entity {
+  id: ID!
+  blockTime: BigInt
+  blockHeight: BigInt
+  blockHash: String
+  predecessorId: String
+  receiverId: String
+  signerId: String
+  signerPublicKey: String
+  gasBurned: BigInt
+  tokensBurned: BigInt
+  outcomeId: String
+  executorId: String
+  outcomeBlockHash: String
+  log: String
+  # above here are standard field properties, add custom ones below
+  accountId: String
+  did: String
+  registered: BigInt
+  owner: String
+}
+
+type BurnCoin @entity {
+  id: ID!
+  blockTime: BigInt
+  blockHeight: BigInt
+  blockHash: String
+  predecessorId: String
+  receiverId: String
+  signerId: String
+  signerPublicKey: String
+  gasBurned: BigInt
+  tokensBurned: BigInt
+  outcomeId: String
+  executorId: String
+  outcomeBlockHash: String
+  log: String
+  # above here are standard field properties, add custom ones below
+  accountId: String
+  did: String
+  registered: BigInt
+  owner: String
+}
+
+type WithdrawToken @entity {
+  id: ID!
+  blockTime: BigInt
+  blockHeight: BigInt
+  blockHash: String
+  predecessorId: String
+  receiverId: String
+  signerId: String
+  signerPublicKey: String
+  gasBurned: BigInt
+  tokensBurned: BigInt
+  outcomeId: String
+  executorId: String
+  outcomeBlockHash: String
+  log: String
+  # above here are standard field properties, add custom ones below
+  accountId: String
+  did: String
+  registered: BigInt
+  owner: String
+}
+
+type Poke @entity {
+  id: ID!
+  blockTime: BigInt
+  blockHeight: BigInt
+  blockHash: String
+  predecessorId: String
+  receiverId: String
+  signerId: String
+  signerPublicKey: String
+  gasBurned: BigInt
+  tokensBurned: BigInt
+  outcomeId: String
+  executorId: String
+  outcomeBlockHash: String
+  log: String
+  # above here are standard field properties, add custom ones below
+  accountId: String
+  did: String
+  registered: BigInt
+  owner: String
+}
+
+type AfterWithdrawToken @entity {
+  id: ID!
+  blockTime: BigInt
+  blockHeight: BigInt
+  blockHash: String
+  predecessorId: String
+  receiverId: String
+  signerId: String
+  signerPublicKey: String
+  gasBurned: BigInt
+  tokensBurned: BigInt
+  outcomeId: String
+  executorId: String
+  outcomeBlockHash: String
+  log: String
+  # above here are standard field properties, add custom ones below
+  accountId: String
+  did: String
+  registered: BigInt
+  owner: String
+}
+
+type ClaimToken @entity {
+  id: ID!
+  blockTime: BigInt
+  blockHeight: BigInt
+  blockHash: String
+  predecessorId: String
+  receiverId: String
+  signerId: String
+  signerPublicKey: String
+  gasBurned: BigInt
+  tokensBurned: BigInt
+  outcomeId: String
+  executorId: String
+  outcomeBlockHash: String
+  log: String
+  # above here are standard field properties, add custom ones below
+  accountId: String
+  did: String
+  registered: BigInt
+  owner: String
+}
+
+type OnClaimMinReward @entity {
+  id: ID!
+  blockTime: BigInt
+  blockHeight: BigInt
+  blockHash: String
+  predecessorId: String
+  receiverId: String
+  signerId: String
+  signerPublicKey: String
+  gasBurned: BigInt
+  tokensBurned: BigInt
+  outcomeId: String
+  executorId: String
+  outcomeBlockHash: String
+  log: String
+  # above here are standard field properties, add custom ones below
+  accountId: String
+  did: String
+  registered: BigInt
+  owner: String
+}
+
+type OnClaimDisReward @entity {
+  id: ID!
+  blockTime: BigInt
+  blockHeight: BigInt
+  blockHash: String
+  predecessorId: String
+  receiverId: String
+  signerId: String
+  signerPublicKey: String
+  gasBurned: BigInt
+  tokensBurned: BigInt
+  outcomeId: String
+  executorId: String
+  outcomeBlockHash: String
+  log: String
+  # above here are standard field properties, add custom ones below
+  accountId: String
+  did: String
+  registered: BigInt
+  owner: String
+}
+
+type ClaimReward @entity {
+  id: ID!
+  blockTime: BigInt
+  blockHeight: BigInt
+  blockHash: String
+  predecessorId: String
+  receiverId: String
+  signerId: String
+  signerPublicKey: String
+  gasBurned: BigInt
+  tokensBurned: BigInt
+  outcomeId: String
+  executorId: String
+  outcomeBlockHash: String
+  log: String
+  # above here are standard field properties, add custom ones below
+  accountId: String
+  did: String
+  registered: BigInt
+  owner: String
+}
+
+type OnClaimReward @entity {
+  id: ID!
+  blockTime: BigInt
+  blockHeight: BigInt
+  blockHash: String
+  predecessorId: String
+  receiverId: String
+  signerId: String
+  signerPublicKey: String
+  gasBurned: BigInt
+  tokensBurned: BigInt
+  outcomeId: String
+  executorId: String
+  outcomeBlockHash: String
+  log: String
+  # above here are standard field properties, add custom ones below
+  accountId: String
+  did: String
+  registered: BigInt
+  owner: String
+}
+
+type WithdrawFromSp @entity {
+  id: ID!
+  blockTime: BigInt
+  blockHeight: BigInt
+  blockHash: String
+  predecessorId: String
+  receiverId: String
+  signerId: String
+  signerPublicKey: String
+  gasBurned: BigInt
+  tokensBurned: BigInt
+  outcomeId: String
+  executorId: String
+  outcomeBlockHash: String
+  log: String
+  # above here are standard field properties, add custom ones below
+  accountId: String
+  did: String
+  registered: BigInt
+  owner: String
+}
+
+type OnWithdrawUSDO @entity {
+  id: ID!
+  blockTime: BigInt
+  blockHeight: BigInt
+  blockHash: String
+  predecessorId: String
+  receiverId: String
+  signerId: String
+  signerPublicKey: String
+  gasBurned: BigInt
+  tokensBurned: BigInt
+  outcomeId: String
+  executorId: String
+  outcomeBlockHash: String
+  log: String
+  # above here are standard field properties, add custom ones below
+  accountId: String
+  did: String
+  registered: BigInt
+  owner: String
+}
+
+type ProvideToSp @entity {
   id: ID!
   blockTime: BigInt
   blockHeight: BigInt
