@@ -1,5 +1,5 @@
 import { near, log, BigInt, json, JSONValueKind } from "@graphprotocol/graph-ts"
-import {  AfterWithdrawToken, BurnCoin, FtTransfer, Poke } from "../generated/schema" // ensure to add any entities you define in schema.graphql
+import {  AfterWithdrawToken, BurnCoin, FtTransfer, OnMintTransfer, Poke } from "../generated/schema" // ensure to add any entities you define in schema.graphql
 
 export function handleReceipt(receipt: near.ReceiptWithOutcome): void {
   const actions = receipt.receipt.actions;
@@ -131,6 +131,43 @@ function handleAction(
         transfer.senderId = splitString[3].toString()
 
         transfer.save()
+      
+      } 
+  } else {
+    log.info("Not processed - FunctionCall is: {}", [functionCall.methodName]);
+  }
+
+  if (functionCall.methodName == "on_mint_transfer") {
+    const receiptId = receipt.id.toBase58()
+
+      // Maps the JSON formatted log to the LOG entity
+      let mintTransfer = new OnMintTransfer(`${receiptId}`)
+
+      // Standard receipt properties - likely do not need to change
+      mintTransfer.blockTime = BigInt.fromU64(blockHeader.timestampNanosec/1000000)
+      mintTransfer.blockHeight = BigInt.fromU64(blockHeader.height)
+      mintTransfer.blockHash = blockHeader.hash.toBase58()
+      mintTransfer.predecessorId = receipt.predecessorId
+      mintTransfer.receiverId = receipt.receiverId
+      mintTransfer.signerId = receipt.signerId
+      mintTransfer.signerPublicKey = publicKey.bytes.toBase58()
+      mintTransfer.gasBurned = BigInt.fromU64(outcome.gasBurnt)
+      mintTransfer.tokensBurned = outcome.tokensBurnt
+      mintTransfer.outcomeId = outcome.id.toBase58()
+      mintTransfer.executorId = outcome.executorId
+      mintTransfer.outcomeBlockHash = outcome.blockHash.toBase58()
+
+      // Log parsing
+      if(outcome.logs != null && outcome.logs.length > 0){
+        mintTransfer.log = outcome.logs[0]
+        let splitString = outcome.logs[0].split('"')
+        let stringArray = outcome.logs[0].split(' ')
+        let stringArray2 = stringArray[3].split("(").join(",").split(")").join(",").split(",") 
+        mintTransfer.amountMinted = BigInt.fromString(stringArray2[1]) 
+        mintTransfer.accountId = splitString[1].toString()
+        
+
+        mintTransfer.save()
       
       } 
   } else {
