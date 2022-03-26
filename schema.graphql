@@ -79,10 +79,10 @@ type FtTransfer @entity {
   outcomeBlockHash: String
   log: String
   # above here are standard field properties, add custom ones below
-  accountId: String
-  did: String
-  registered: BigInt
-  owner: String
+  recieverId: String
+  senderId: String
+  amount: BigInt
+
 }
 
 type OnMintTransfer @entity {

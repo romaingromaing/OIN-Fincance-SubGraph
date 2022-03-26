@@ -1,5 +1,5 @@
 import { near, log, BigInt, json, JSONValueKind } from "@graphprotocol/graph-ts"
-import {  AfterWithdrawToken, BurnCoin, Poke } from "../generated/schema" // ensure to add any entities you define in schema.graphql
+import {  AfterWithdrawToken, BurnCoin, FtTransfer, Poke } from "../generated/schema" // ensure to add any entities you define in schema.graphql
 
 export function handleReceipt(receipt: near.ReceiptWithOutcome): void {
   const actions = receipt.receipt.actions;
@@ -95,6 +95,42 @@ function handleAction(
         afterWithdraw.accountId = splitString[0].toString()
 
         afterWithdraw.save()
+      
+      } 
+  } else {
+    log.info("Not processed - FunctionCall is: {}", [functionCall.methodName]);
+  }
+
+  if (functionCall.methodName == "ft_transfer") {
+    const receiptId = receipt.id.toBase58()
+
+      // Maps the JSON formatted log to the LOG entity
+      let transfer = new FtTransfer(`${receiptId}`)
+
+      // Standard receipt properties - likely do not need to change
+      transfer.blockTime = BigInt.fromU64(blockHeader.timestampNanosec/1000000)
+      transfer.blockHeight = BigInt.fromU64(blockHeader.height)
+      transfer.blockHash = blockHeader.hash.toBase58()
+      transfer.predecessorId = receipt.predecessorId
+      transfer.receiverId = receipt.receiverId
+      transfer.signerId = receipt.signerId
+      transfer.signerPublicKey = publicKey.bytes.toBase58()
+      transfer.gasBurned = BigInt.fromU64(outcome.gasBurnt)
+      transfer.tokensBurned = outcome.tokensBurnt
+      transfer.outcomeId = outcome.id.toBase58()
+      transfer.executorId = outcome.executorId
+      transfer.outcomeBlockHash = outcome.blockHash.toBase58()
+
+      // Log parsing
+      if(outcome.logs != null && outcome.logs.length > 0){
+        transfer.log = outcome.logs[0]
+        
+        let splitString = outcome.logs[0].split(' ')
+        transfer.amount = BigInt.fromString(splitString[1])
+        transfer.recieverId = splitString[5].toString()
+        transfer.senderId = splitString[3].toString()
+
+        transfer.save()
       
       } 
   } else {
