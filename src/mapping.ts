@@ -1,5 +1,5 @@
 import { near, log, BigInt, json, JSONValueKind } from "@graphprotocol/graph-ts"
-import {  Poke } from "../generated/schema" // ensure to add any entities you define in schema.graphql
+import {  AfterWithdrawToken, BurnCoin, Poke } from "../generated/schema" // ensure to add any entities you define in schema.graphql
 
 export function handleReceipt(receipt: near.ReceiptWithOutcome): void {
   const actions = receipt.receipt.actions;
@@ -66,5 +66,39 @@ function handleAction(
     log.info("Not processed - FunctionCall is: {}", [functionCall.methodName]);
   }
 
+  if (functionCall.methodName == "after_withdraw_token") {
+    const receiptId = receipt.id.toBase58()
+
+      // Maps the JSON formatted log to the LOG entity
+      let afterWithdraw = new AfterWithdrawToken(`${receiptId}`)
+
+      // Standard receipt properties - likely do not need to change
+      afterWithdraw.blockTime = BigInt.fromU64(blockHeader.timestampNanosec/1000000)
+      afterWithdraw.blockHeight = BigInt.fromU64(blockHeader.height)
+      afterWithdraw.blockHash = blockHeader.hash.toBase58()
+      afterWithdraw.predecessorId = receipt.predecessorId
+      afterWithdraw.receiverId = receipt.receiverId
+      afterWithdraw.signerId = receipt.signerId
+      afterWithdraw.signerPublicKey = publicKey.bytes.toBase58()
+      afterWithdraw.gasBurned = BigInt.fromU64(outcome.gasBurnt)
+      afterWithdraw.tokensBurned = outcome.tokensBurnt
+      afterWithdraw.outcomeId = outcome.id.toBase58()
+      afterWithdraw.executorId = outcome.executorId
+      afterWithdraw.outcomeBlockHash = outcome.blockHash.toBase58()
+
+      // Log parsing
+      if(outcome.logs != null && outcome.logs.length > 0){
+        afterWithdraw.log = outcome.logs[0]
+        
+        let splitString = outcome.logs[0].split(' ')
+        afterWithdraw.amountWithdrawn = BigInt.fromString(splitString[4])
+        afterWithdraw.accountId = splitString[0].toString()
+
+        afterWithdraw.save()
+      
+      } 
+  } else {
+    log.info("Not processed - FunctionCall is: {}", [functionCall.methodName]);
+  }
 
 }
