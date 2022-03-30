@@ -35,10 +35,9 @@ type FtTransferCall @entity {
   outcomeBlockHash: String
   log: String
   # above here are standard field properties, add custom ones below
-  accountId: String
-  did: String
-  registered: BigInt
-  owner: String
+  amountTransfered: BigInt
+  transferedTo: String
+  transferedFrom: String
 }
 
 type MintCoin @entity {
@@ -121,10 +120,17 @@ type BurnCoin @entity {
   outcomeBlockHash: String
   log: String
   # above here are standard field properties, add custom ones below
-  accountId: String
-  did: String
-  registered: BigInt
-  owner: String
+  sysTime: BigInt
+  currentTime: BigInt
+  totalCoin: BigInt
+  systemIndex: BigInt
+  index: BigInt
+  totalUnpaidStableFee: BigInt
+  userUnpaidStableFee: BigInt
+  amountTransfered: BigInt
+  transferedTo: String
+  transferedFrom: String
+  reward: BigInt
 }
 
 type WithdrawToken @entity {

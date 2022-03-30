@@ -9,7 +9,7 @@ dataSources:
     network: near-mainnet # can choose near-mainnet or near-testnet
     source:
       account: v3.oin_finance.near # contract account you want to pull data from
-      startBlock: 55263597 # starting block on near-mainnet for indexing
+      startBlock: 55263597 # starting block on near-mainnet for indexing  #55263597
     mapping:
       apiVersion: 0.0.5
       language: wasm/assemblyscript

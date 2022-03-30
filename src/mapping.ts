@@ -1,5 +1,5 @@
 import { near, log, BigInt, json, JSONValueKind } from "@graphprotocol/graph-ts"
-import {  AfterWithdrawToken, BurnCoin, FtTransfer, OnMintTransfer, Poke } from "../generated/schema" // ensure to add any entities you define in schema.graphql
+import {  AfterWithdrawToken, BurnCoin, FtTransfer, FtTransferCall, OnMintTransfer, Poke } from "../generated/schema" // ensure to add any entities you define in schema.graphql
 
 export function handleReceipt(receipt: near.ReceiptWithOutcome): void {
   const actions = receipt.receipt.actions;
@@ -53,7 +53,6 @@ function handleAction(
 
       // Log parsing
       if(outcome.logs != null && outcome.logs.length > 0){
-        pokes.log = outcome.logs[0]
         
         let splitString = outcome.logs[0].split(' ')
         pokes.price = BigInt.fromString(splitString[3])
@@ -88,11 +87,10 @@ function handleAction(
 
       // Log parsing
       if(outcome.logs != null && outcome.logs.length > 0){
-        afterWithdraw.log = outcome.logs[0]
-        
+        let splitString2 = outcome.logs[0].split('"')
         let splitString = outcome.logs[0].split(' ')
         afterWithdraw.amountWithdrawn = BigInt.fromString(splitString[4])
-        afterWithdraw.accountId = splitString[0].toString()
+        afterWithdraw.accountId = splitString2[1].toString()
 
         afterWithdraw.save()
       
@@ -123,7 +121,6 @@ function handleAction(
 
       // Log parsing
       if(outcome.logs != null && outcome.logs.length > 0){
-        transfer.log = outcome.logs[0]
         
         let splitString = outcome.logs[0].split(' ')
         transfer.amount = BigInt.fromString(splitString[1])
@@ -159,7 +156,6 @@ function handleAction(
 
       // Log parsing
       if(outcome.logs != null && outcome.logs.length > 0){
-        mintTransfer.log = outcome.logs[0]
         let splitString = outcome.logs[0].split('"')
         let stringArray = outcome.logs[0].split(' ')
         let stringArray2 = stringArray[3].split("(").join(",").split(")").join(",").split(",") 
@@ -169,6 +165,100 @@ function handleAction(
 
         mintTransfer.save()
       
+      } 
+  } else {
+    log.info("Not processed - FunctionCall is: {}", [functionCall.methodName]);
+  }
+
+  if (functionCall.methodName == "ft_transfer_call") {
+    const receiptId = receipt.id.toBase58()
+
+      // Maps the JSON formatted log to the LOG entity
+      let transferCall = new FtTransferCall(`${receiptId}`)
+
+      // Standard receipt properties - likely do not need to change
+      transferCall.blockTime = BigInt.fromU64(blockHeader.timestampNanosec/1000000)
+      transferCall.blockHeight = BigInt.fromU64(blockHeader.height)
+      transferCall.blockHash = blockHeader.hash.toBase58()
+      transferCall.predecessorId = receipt.predecessorId
+      transferCall.receiverId = receipt.receiverId
+      transferCall.signerId = receipt.signerId
+      transferCall.signerPublicKey = publicKey.bytes.toBase58()
+      transferCall.gasBurned = BigInt.fromU64(outcome.gasBurnt)
+      transferCall.tokensBurned = outcome.tokensBurnt
+      transferCall.outcomeId = outcome.id.toBase58()
+      transferCall.executorId = outcome.executorId
+      transferCall.outcomeBlockHash = outcome.blockHash.toBase58()
+
+      // Log parsing
+      if(outcome.logs != null && outcome.logs.length > 0){
+        let splitString = outcome.logs[0].split(' ')
+        transferCall.amountTransfered = BigInt.fromString(splitString[1]) 
+        transferCall.transferedFrom = splitString[3].toString()
+        transferCall.transferedTo = splitString[5].toString()
+        
+
+        transferCall.save()
+      
+      } 
+  } else {
+    log.info("Not processed - FunctionCall is: {}", [functionCall.methodName]);
+  }
+
+  if (functionCall.methodName == "burn_coin") {
+    const receiptId = receipt.id.toBase58()
+
+      // Maps the JSON formatted log to the LOG entity
+      let burn = new BurnCoin(`${receiptId}`)
+
+      // Standard receipt properties - likely do not need to change
+      burn.blockTime = BigInt.fromU64(blockHeader.timestampNanosec/1000000)
+      burn.blockHeight = BigInt.fromU64(blockHeader.height)
+      burn.blockHash = blockHeader.hash.toBase58()
+      burn.predecessorId = receipt.predecessorId
+      burn.receiverId = receipt.receiverId
+      burn.signerId = receipt.signerId
+      burn.signerPublicKey = publicKey.bytes.toBase58()
+      burn.gasBurned = BigInt.fromU64(outcome.gasBurnt)
+      burn.tokensBurned = outcome.tokensBurnt
+      burn.outcomeId = outcome.id.toBase58()
+      burn.executorId = outcome.executorId
+      burn.outcomeBlockHash = outcome.blockHash.toBase58()
+
+      // Log parsing
+      if(outcome.logs != null && outcome.logs.length > 0){
+        let splitString = outcome.logs[0].split(' ')
+        let splitString1 = outcome.logs[1].split(',').join(' ').split(' ')
+        let splitString2 = outcome.logs[2].split(',').join(' ').split(' ')
+        let splitString3 = outcome.logs[3].split(',').join(' ').split(' ')
+
+        if(splitString3[0] == "Transfer") {
+          burn.currentTime = BigInt.fromString(splitString[3])
+          burn.sysTime = BigInt.fromString(splitString1[6])
+          burn.totalCoin = BigInt.fromString(splitString1[8]) 
+          burn.totalUnpaidStableFee = BigInt.fromString(splitString1[14]) 
+          burn.systemIndex =  BigInt.fromString(splitString1[11])
+          burn.index = BigInt.fromString(splitString2[8])
+          burn.userUnpaidStableFee= BigInt.fromString(splitString2[5])
+          burn.amountTransfered= BigInt.fromString(splitString3[1])
+          burn.transferedTo = splitString3[5].toString()
+          burn.transferedFrom = splitString3[3].toString()
+          
+          burn.save()
+        }
+        else {
+          burn.currentTime = BigInt.fromString(splitString[3])
+          burn.reward = BigInt.fromString(splitString1[8])
+          burn.index = BigInt.fromString(splitString1[11])
+          burn.sysTime = BigInt.fromString(splitString2[6])
+          burn.totalCoin = BigInt.fromString(splitString1[8]) 
+          burn.totalUnpaidStableFee = BigInt.fromString(splitString2[14]) 
+          burn.systemIndex =  BigInt.fromString(splitString2[11])
+          burn.userUnpaidStableFee= BigInt.fromString(splitString3[5])
+          
+          burn.save()
+        
+        }
       } 
   } else {
     log.info("Not processed - FunctionCall is: {}", [functionCall.methodName]);
