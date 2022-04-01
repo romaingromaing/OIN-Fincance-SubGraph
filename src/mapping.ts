@@ -1,5 +1,5 @@
 import { near, log, BigInt, json, JSONValueKind } from "@graphprotocol/graph-ts"
-import {  AfterWithdrawToken, BurnCoin, FtTransfer, FtTransferCall, OnMintTransfer, Poke } from "../generated/schema" // ensure to add any entities you define in schema.graphql
+import {  AfterWithdrawToken, BurnCoin, FtTransfer, FtTransferCall, OnMintTransfer, Poke, RegisterAccount } from "../generated/schema" // ensure to add any entities you define in schema.graphql
 
 export function handleReceipt(receipt: near.ReceiptWithOutcome): void {
   const actions = receipt.receipt.actions;
@@ -228,11 +228,11 @@ function handleAction(
       // Log parsing
       if(outcome.logs != null && outcome.logs.length > 0){
         let splitString = outcome.logs[0].split(' ')
-        let splitString1 = outcome.logs[1].split(',').join(' ').split(' ')
+        let splitString1 = outcome.logs[1].split(',').join(' ').split('"').join('').split(' ')
         let splitString2 = outcome.logs[2].split(',').join(' ').split(' ')
         let splitString3 = outcome.logs[3].split(',').join(' ').split(' ')
 
-        if(splitString3[0] == "Transfer") {
+        if(splitString3[0] == "Transfer") {  // https://explorer.near.org/transactions/8aLAhpxTTxtQazD2ut2zv5cFkf8y8pVCAcxPmZ6mSFcS#FnmmZQsLCWFoL6eNRS7bksSrwohieka4yjZ2U4Szdxp3
           burn.currentTime = BigInt.fromString(splitString[3])
           burn.sysTime = BigInt.fromString(splitString1[6])
           burn.totalCoin = BigInt.fromString(splitString1[8]) 
@@ -245,8 +245,8 @@ function handleAction(
           burn.transferedFrom = splitString3[3].toString()
           
           burn.save()
-        }
-        else {
+        } 
+        else if (splitString3[0] == "Current"){  //https://explorer.near.org/transactions/9CFmEY5GNyd33hc9B2YRMgKj3qMvhUqrkfV1D8JNqh8a#FBJq4SbGhKa18MbiiHBm4uXmWj4CNFPhfQLRTf84F8c3
           burn.currentTime = BigInt.fromString(splitString[3])
           burn.reward = BigInt.fromString(splitString1[8])
           burn.index = BigInt.fromString(splitString1[11])
@@ -259,6 +259,56 @@ function handleAction(
           burn.save()
         
         }
+        else if (outcome.logs.length == 6){  //going to need to add a if(outcome.logs.length > 3) https://explorer.near.org/transactions/7qMwmwhDXNhyZTRBCADCYNwZuxrAA6XfbikAfJSBtknC#2SboVMJ6JVFfmUrN8aPiNYUAdo1iN29ivTdykmma1bnB
+          let splitString4 = outcome.logs[4].split(',').join(' ').split(' ') 
+          //let splitString5 = outcome.logs[5].split(',').join(' ').split(' ') causing issues posssibly is only an array of 4?
+          //burn.currentTime = BigInt.fromString(splitString[3])
+          //burn.token = splitString1[10].toString()
+          log.info("Not processed - FunctionCall is: {}", [functionCall.methodName]);
+        }
+
+        else if (outcome.logs.length == 5){  //5  https://explorer.near.org/transactions/B1SRemCgyjhx3CTTaX49MPjK5Exiuzoa4Zq7ckHaWoTE#4tQhMwRLHDjvqzdurkCp9jaFsLAVvVJRUhhdcVK6ByBa
+          let splitString4 = outcome.logs[4].split(',').join(' ').split(' ')
+          log.info("Not processed - FunctionCall is: {}", [functionCall.methodName]);
+        }
+
+        else if (outcome.logs.length == 3){ //https://explorer.near.org/transactions/B73rG2NTjVpUKZhMoBWfSDzmTeLpQhLP3Hj5wnYZEkzN#Am2jvifibB9NZcypZ3FWycU4J2fGa8GDVgCzHqw2XkkZ
+
+        }
+      } 
+  } else {
+    log.info("Not processed - FunctionCall is: {}", [functionCall.methodName]);
+  }
+
+  if (functionCall.methodName == "register_account") {
+    const receiptId = receipt.id.toBase58()
+
+      // Maps the JSON formatted log to the LOG entity
+      let register = new RegisterAccount(`${receiptId}`)
+
+      // Standard receipt properties - likely do not need to change
+      register.blockTime = BigInt.fromU64(blockHeader.timestampNanosec/1000000)
+      register.blockHeight = BigInt.fromU64(blockHeader.height)
+      register.blockHash = blockHeader.hash.toBase58()
+      register.predecessorId = receipt.predecessorId
+      register.receiverId = receipt.receiverId
+      register.signerId = receipt.signerId
+      register.signerPublicKey = publicKey.bytes.toBase58()
+      register.gasBurned = BigInt.fromU64(outcome.gasBurnt)
+      register.tokensBurned = outcome.tokensBurnt
+      register.outcomeId = outcome.id.toBase58()
+      register.executorId = outcome.executorId
+      register.outcomeBlockHash = outcome.blockHash.toBase58()
+
+      // Log parsing
+      if(outcome.logs != null && outcome.logs.length > 0){
+        
+        let splitString = outcome.logs[0].split('：')
+        register.gas = BigInt.fromString(splitString[1])
+
+
+        register.save()
+      
       } 
   } else {
     log.info("Not processed - FunctionCall is: {}", [functionCall.methodName]);

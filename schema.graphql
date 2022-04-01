@@ -130,7 +130,11 @@ type BurnCoin @entity {
   amountTransfered: BigInt
   transferedTo: String
   transferedFrom: String
+  token: String
   reward: BigInt
+  totalReward: BigInt
+  rewardSpeed: BigInt
+  doubleScale: BigInt
 }
 
 type WithdrawToken @entity {
@@ -171,10 +175,7 @@ type RegisterAccount @entity { # Possibly not useful
   outcomeBlockHash: String
   log: String
   # above here are standard field properties, add custom ones below
-  accountId: String
-  did: String
-  registered: BigInt
-  owner: String
+  gas: BigInt
 }
 
 type AfterWithdrawToken @entity {
@@ -264,28 +265,6 @@ type OnClaimDisReward @entity {
 }
 
 type ClaimReward @entity {
-  id: ID!
-  blockTime: BigInt
-  blockHeight: BigInt
-  blockHash: String
-  predecessorId: String
-  receiverId: String
-  signerId: String
-  signerPublicKey: String
-  gasBurned: BigInt
-  tokensBurned: BigInt
-  outcomeId: String
-  executorId: String
-  outcomeBlockHash: String
-  log: String
-  # above here are standard field properties, add custom ones below
-  accountId: String
-  did: String
-  registered: BigInt
-  owner: String
-}
-
-type OnClaimReward @entity {
   id: ID!
   blockTime: BigInt
   blockHeight: BigInt
