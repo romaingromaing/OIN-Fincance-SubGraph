@@ -230,52 +230,113 @@ function handleAction(
         let splitString = outcome.logs[0].split(' ')
         let splitString1 = outcome.logs[1].split(',').join(' ').split('"').join('').split(' ')
         let splitString2 = outcome.logs[2].split(',').join(' ').split(' ')
-        let splitString3 = outcome.logs[3].split(',').join(' ').split(' ')
+        
+        
+        if(outcome.logs.length == 4){
+          let splitString3 = outcome.logs[3].split(',').join(' ').split(' ')
 
-        if(splitString3[0] == "Transfer") {  // https://explorer.near.org/transactions/8aLAhpxTTxtQazD2ut2zv5cFkf8y8pVCAcxPmZ6mSFcS#FnmmZQsLCWFoL6eNRS7bksSrwohieka4yjZ2U4Szdxp3
+          if(splitString3[0] == "Transfer") {  // https://explorer.near.org/transactions/8aLAhpxTTxtQazD2ut2zv5cFkf8y8pVCAcxPmZ6mSFcS#FnmmZQsLCWFoL6eNRS7bksSrwohieka4yjZ2U4Szdxp3
+            burn.currentTime = BigInt.fromString(splitString[3])
+            burn.sysTime = BigInt.fromString(splitString1[6])
+            burn.totalCoin = BigInt.fromString(splitString1[8]) 
+            burn.totalUnpaidStableFee = BigInt.fromString(splitString1[14]) 
+            burn.systemIndex =  BigInt.fromString(splitString1[11])
+            burn.index = BigInt.fromString(splitString2[8])
+            burn.userUnpaidStableFee= BigInt.fromString(splitString2[5])
+            burn.amountTransfered= BigInt.fromString(splitString3[1])
+            burn.transferedTo = splitString3[5].toString()
+            burn.transferedFrom = splitString3[3].toString()
+            
+            burn.save()
+          } 
+          else if (splitString3[0] == "Current"){  //https://explorer.near.org/transactions/9CFmEY5GNyd33hc9B2YRMgKj3qMvhUqrkfV1D8JNqh8a#FBJq4SbGhKa18MbiiHBm4uXmWj4CNFPhfQLRTf84F8c3
+            burn.currentTime = BigInt.fromString(splitString[3])
+            burn.reward = BigInt.fromString(splitString1[8])
+            burn.index = BigInt.fromString(splitString1[11])
+            burn.sysTime = BigInt.fromString(splitString2[6])
+            burn.totalCoin = BigInt.fromString(splitString1[8]) 
+            burn.totalUnpaidStableFee = BigInt.fromString(splitString2[14]) 
+            burn.systemIndex =  BigInt.fromString(splitString2[11])
+            burn.userUnpaidStableFee= BigInt.fromString(splitString3[5])
+            
+            burn.save()
+          
+          }
+        }
+
+        else if (outcome.logs.length == 3 ){ // https://explorer.near.org/transactions/B73rG2NTjVpUKZhMoBWfSDzmTeLpQhLP3Hj5wnYZEkzN#Am2jvifibB9NZcypZ3FWycU4J2fGa8GDVgCzHqw2XkkZ
           burn.currentTime = BigInt.fromString(splitString[3])
           burn.sysTime = BigInt.fromString(splitString1[6])
-          burn.totalCoin = BigInt.fromString(splitString1[8]) 
-          burn.totalUnpaidStableFee = BigInt.fromString(splitString1[14]) 
-          burn.systemIndex =  BigInt.fromString(splitString1[11])
-          burn.index = BigInt.fromString(splitString2[8])
-          burn.userUnpaidStableFee= BigInt.fromString(splitString2[5])
-          burn.amountTransfered= BigInt.fromString(splitString3[1])
-          burn.transferedTo = splitString3[5].toString()
-          burn.transferedFrom = splitString3[3].toString()
-          
+          burn.totalCoin = BigInt.fromString(splitString1[8])
+          burn.systemIndex = BigInt.fromString(splitString1[11])
+          burn.totalUnpaidStableFee = BigInt.fromString(splitString1[14])
+          burn.userUnpaidStableFee = BigInt.fromString(splitString2[5])
+          burn.index= BigInt.fromString(splitString2[8])
+        
           burn.save()
         } 
-        else if (splitString3[0] == "Current"){  //https://explorer.near.org/transactions/9CFmEY5GNyd33hc9B2YRMgKj3qMvhUqrkfV1D8JNqh8a#FBJq4SbGhKa18MbiiHBm4uXmWj4CNFPhfQLRTf84F8c3
-          burn.currentTime = BigInt.fromString(splitString[3])
-          burn.reward = BigInt.fromString(splitString1[8])
-          burn.index = BigInt.fromString(splitString1[11])
-          burn.sysTime = BigInt.fromString(splitString2[6])
-          burn.totalCoin = BigInt.fromString(splitString1[8]) 
-          burn.totalUnpaidStableFee = BigInt.fromString(splitString2[14]) 
-          burn.systemIndex =  BigInt.fromString(splitString2[11])
-          burn.userUnpaidStableFee= BigInt.fromString(splitString3[5])
-          
-          burn.save()
-        
-        }
-        else if (outcome.logs.length == 6){  //going to need to add a if(outcome.logs.length > 3) https://explorer.near.org/transactions/7qMwmwhDXNhyZTRBCADCYNwZuxrAA6XfbikAfJSBtknC#2SboVMJ6JVFfmUrN8aPiNYUAdo1iN29ivTdykmma1bnB
-          let splitString4 = outcome.logs[4].split(',').join(' ').split(' ') 
-          //let splitString5 = outcome.logs[5].split(',').join(' ').split(' ') causing issues posssibly is only an array of 4?
-          //burn.currentTime = BigInt.fromString(splitString[3])
-          //burn.token = splitString1[10].toString()
-          log.info("Not processed - FunctionCall is: {}", [functionCall.methodName]);
-        }
 
-        else if (outcome.logs.length == 5){  //5  https://explorer.near.org/transactions/B1SRemCgyjhx3CTTaX49MPjK5Exiuzoa4Zq7ckHaWoTE#4tQhMwRLHDjvqzdurkCp9jaFsLAVvVJRUhhdcVK6ByBa
+
+        else if (outcome.logs.length == 5) {
+          let splitString3 = outcome.logs[3].split(',').join(' ').split(' ')
           let splitString4 = outcome.logs[4].split(',').join(' ').split(' ')
-          log.info("Not processed - FunctionCall is: {}", [functionCall.methodName]);
-        }
 
-        else if (outcome.logs.length == 3){ //https://explorer.near.org/transactions/B73rG2NTjVpUKZhMoBWfSDzmTeLpQhLP3Hj5wnYZEkzN#Am2jvifibB9NZcypZ3FWycU4J2fGa8GDVgCzHqw2XkkZ
-
+          if (splitString4[0] == "Current"){  // https://explorer.near.org/transactions/B1SRemCgyjhx3CTTaX49MPjK5Exiuzoa4Zq7ckHaWoTE#4tQhMwRLHDjvqzdurkCp9jaFsLAVvVJRUhhdcVK6ByBa
+            burn.currentTime = BigInt.fromString(splitString[3])
+            burn.token = splitString1[9].toString()
+            burn.totalReward = BigInt.fromString(splitString1[12])
+            burn.rewardSpeed = BigInt.fromString(splitString1[15])
+            burn.index = BigInt.fromString(splitString1[18])
+            burn.doubleScale = BigInt.fromString(splitString1[21])
+            burn.reward =BigInt.fromString(splitString2[8])
+            burn.sysTime = BigInt.fromString(splitString3[6])
+            burn.totalCoin = BigInt.fromString(splitString3[8])
+            burn. systemIndex = BigInt.fromString(splitString3[11])
+            burn.totalUnpaidStableFee = BigInt.fromString(splitString3[14])
+            burn.userUnpaidStableFee = BigInt.fromString(splitString4[5]) 
+          
+            burn.save() //this one works and is finsihed
         }
-      } 
+          else if(splitString4[0] == "Transfer") {   //https://explorer.near.org/transactions/GeJx3iMn4yeDRXEVMUM1m6vFWkgo3qYnGbgAP2vWX7ZE#EPhtWu6SF23k6mY8vgsktGgEp8v7mABa5FgNZf716deo
+            burn.currentTime = BigInt.fromString(splitString[3])
+            burn.reward = BigInt.fromString(splitString1[8])
+            burn.index = BigInt.fromString(splitString1[11])
+            burn.sysTime = BigInt.fromString(splitString2[6])
+            burn.totalCoin = BigInt.fromString(splitString2[8])
+            burn.systemIndex = BigInt.fromString(splitString2[11])
+            burn.totalUnpaidStableFee = BigInt.fromString(splitString2[14])
+            burn.userUnpaidStableFee= BigInt.fromString(splitString3[5])
+            burn.transferedFrom = splitString4[3].toString()
+            burn.transferedTo = splitString4[5].toString()
+            burn.amountTransfered = BigInt.fromString(splitString4[1]) 
+
+            burn.save()
+        }
+      }
+
+      else if (outcome.logs.length == 6){  //going to need to add a if(outcome.logs.length > 3) https://explorer.near.org/transactions/7qMwmwhDXNhyZTRBCADCYNwZuxrAA6XfbikAfJSBtknC#2SboVMJ6JVFfmUrN8aPiNYUAdo1iN29ivTdykmma1bnB
+        let splitString3 = outcome.logs[3].split(',').join(' ').split(' ')
+        let splitString4 = outcome.logs[4].split(',').join(' ').split(' ') 
+        let splitString5 = outcome.logs[5].split(',').join(' ').split(' ')
+
+        burn.currentTime = BigInt.fromString(splitString[3])
+        burn.token = splitString1[9].toString()
+        burn.totalReward = BigInt.fromString(splitString1[12])
+        burn.rewardSpeed = BigInt.fromString(splitString1[15])
+        burn.index = BigInt.fromString(splitString1[18])
+        burn.doubleScale = BigInt.fromString(splitString1[21])
+        burn.reward =BigInt.fromString(splitString2[8])
+        burn.sysTime = BigInt.fromString(splitString3[6])
+        burn.totalCoin = BigInt.fromString(splitString3[8])
+        burn. systemIndex = BigInt.fromString(splitString3[11])
+        burn.totalUnpaidStableFee = BigInt.fromString(splitString3[14])
+        burn.userUnpaidStableFee = BigInt.fromString(splitString4[5]) 
+        burn.transferedFrom = splitString5[3].toString()
+        burn.transferedTo = splitString5[5].toString()
+        burn.amountTransfered = BigInt.fromString(splitString5[1]) 
+      }
+
+     }
   } else {
     log.info("Not processed - FunctionCall is: {}", [functionCall.methodName]);
   }
