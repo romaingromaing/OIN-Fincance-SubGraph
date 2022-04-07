@@ -56,10 +56,20 @@ type MintCoin @entity {
   outcomeBlockHash: String
   log: String
   # above here are standard field properties, add custom ones below
-  accountId: String
-  did: String
-  registered: BigInt
-  owner: String
+  currentTime: BigInt
+  currentSysTime: BigInt
+  totalCoin: BigInt
+  systemIndex: BigInt
+  totalUnpaidStableFee: BigInt
+  userUnpaidStableFee: BigInt
+  index: BigInt
+  token: String
+  totalReward: BigInt
+  rewardSpeed: BigInt
+  doubleScale: BigInt
+  userReward: BigInt
+  rewardIndex: BigInt
+
 }
 
 type FtTransfer @entity {
@@ -153,13 +163,19 @@ type WithdrawToken @entity {
   outcomeBlockHash: String
   log: String
   # above here are standard field properties, add custom ones below
-  accountId: String
-  did: String
-  registered: BigInt
-  owner: String
+  token: BigInt
+  amount: BigInt
+  currentTime: BigInt
+  currentSysTime: BigInt
+  totalCoin: BigInt
+  systemIndex: BigInt
+  totalUnpaidStableFee: BigInt
+  userUnpaidStableFee: BigInt
+  index: BigInt
+  
 }
 
-type RegisterAccount @entity { # Possibly not useful 
+type RegisterAccount @entity {
   id: ID!
   blockTime: BigInt
   blockHeight: BigInt
@@ -331,6 +347,28 @@ type OnWithdrawUSDO @entity {
 }
 
 type ProvideToSp @entity {
+  id: ID!
+  blockTime: BigInt
+  blockHeight: BigInt
+  blockHash: String
+  predecessorId: String
+  receiverId: String
+  signerId: String
+  signerPublicKey: String
+  gasBurned: BigInt
+  tokensBurned: BigInt
+  outcomeId: String
+  executorId: String
+  outcomeBlockHash: String
+  log: String
+  # above here are standard field properties, add custom ones below
+  accountId: String
+  did: String
+  registered: BigInt
+  owner: String
+}
+
+type Liquidation @entity {
   id: ID!
   blockTime: BigInt
   blockHeight: BigInt

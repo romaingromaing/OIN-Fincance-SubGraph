@@ -1,5 +1,5 @@
 import { near, log, BigInt, json, JSONValueKind } from "@graphprotocol/graph-ts"
-import {  AfterWithdrawToken, BurnCoin, FtTransfer, FtTransferCall, OnMintTransfer, Poke, RegisterAccount } from "../generated/schema" // ensure to add any entities you define in schema.graphql
+import {  AfterWithdrawToken, BurnCoin, FtTransfer, FtTransferCall, MintCoin, OnMintTransfer, Poke, RegisterAccount, WithdrawToken } from "../generated/schema" // ensure to add any entities you define in schema.graphql
 
 export function handleReceipt(receipt: near.ReceiptWithOutcome): void {
   const actions = receipt.receipt.actions;
@@ -371,6 +371,124 @@ function handleAction(
         register.save()
       
       } 
+  } else {
+    log.info("Not processed - FunctionCall is: {}", [functionCall.methodName]);
+  }
+
+  if (functionCall.methodName == "mint_coin") {
+    const receiptId = receipt.id.toBase58()
+
+      // Maps the JSON formatted log to the LOG entity
+      let mint = new MintCoin(`${receiptId}`)
+
+      // Standard receipt properties - likely do not need to change
+      mint.blockTime = BigInt.fromU64(blockHeader.timestampNanosec/1000000)
+      mint.blockHeight = BigInt.fromU64(blockHeader.height)
+      mint.blockHash = blockHeader.hash.toBase58()
+      mint.predecessorId = receipt.predecessorId
+      mint.receiverId = receipt.receiverId
+      mint.signerId = receipt.signerId
+      mint.signerPublicKey = publicKey.bytes.toBase58()
+      mint.gasBurned = BigInt.fromU64(outcome.gasBurnt)
+      mint.tokensBurned = outcome.tokensBurnt
+      mint.outcomeId = outcome.id.toBase58()
+      mint.executorId = outcome.executorId
+      mint.outcomeBlockHash = outcome.blockHash.toBase58()
+
+      // Log parsing
+      if(outcome.logs != null && outcome.logs.length > 0){
+        let splitString = outcome.logs[0].split(' ')
+        let splitString2 = outcome.logs[2].split(',').join(' ').split(' ')
+        
+        
+        if (outcome.logs.length == 4) {
+          let splitString1 = outcome.logs[1].split(',').join(' ').split(' ')
+
+          mint.currentTime = BigInt.fromString(splitString[3])
+          mint.currentSysTime = BigInt.fromString(splitString1[6])
+          mint.totalCoin = BigInt.fromString(splitString1[8])
+          mint.systemIndex = BigInt.fromString(splitString1[11])
+          mint.totalUnpaidStableFee = BigInt.fromString(splitString1[14])
+          mint.userUnpaidStableFee = BigInt.fromString(splitString2[5])
+          mint.index = BigInt.fromString(splitString2[8])
+
+          mint.save()
+        }
+
+        else if (outcome.logs.length == 6) { //longer log output variation
+          let splitString1 = outcome.logs[1].split(',').join(' ').split('"').join('').split(' ')
+          let splitString3 = outcome.logs[3].split(',').join(' ').split(' ')
+          let splitString4 = outcome.logs[4].split(',').join(' ').split(' ')
+          let splitString5 = outcome.logs[5].split(',').join(' ').split(' ')
+
+          mint.currentTime = BigInt.fromString(splitString[3])
+          mint.token = splitString1[9].toString()
+          mint.totalReward = BigInt.fromString(splitString1[12])
+          mint.rewardSpeed = BigInt.fromString(splitString1[15])
+          mint.rewardIndex = BigInt.fromString(splitString1[18])
+          mint.doubleScale = BigInt.fromString(splitString1[21])
+          mint.userReward = BigInt.fromString(splitString2[8])
+          mint.currentSysTime = BigInt.fromString(splitString3[6])
+          mint.totalCoin = BigInt.fromString(splitString3[8])
+          mint.systemIndex = BigInt.fromString(splitString3[11])
+          mint.totalUnpaidStableFee = BigInt.fromString(splitString3[14])
+          mint.userUnpaidStableFee = BigInt.fromString(splitString4[5])
+          mint.index = BigInt.fromString(splitString4[8])
+
+          mint.save()
+        }
+
+      } 
+  } else {
+    log.info("Not processed - FunctionCall is: {}", [functionCall.methodName]);
+  }
+
+  if (functionCall.methodName == "withdraw_token") {
+    const receiptId = receipt.id.toBase58()
+
+      // Maps the JSON formatted log to the LOG entity
+      let withdraw = new WithdrawToken(`${receiptId}`)
+
+      // Standard receipt properties - likely do not need to change
+      withdraw.blockTime = BigInt.fromU64(blockHeader.timestampNanosec/1000000)
+      withdraw.blockHeight = BigInt.fromU64(blockHeader.height)
+      withdraw.blockHash = blockHeader.hash.toBase58()
+      withdraw.predecessorId = receipt.predecessorId
+      withdraw.receiverId = receipt.receiverId
+      withdraw.signerId = receipt.signerId
+      withdraw.signerPublicKey = publicKey.bytes.toBase58()
+      withdraw.gasBurned = BigInt.fromU64(outcome.gasBurnt)
+      withdraw.tokensBurned = outcome.tokensBurnt
+      withdraw.outcomeId = outcome.id.toBase58()
+      withdraw.executorId = outcome.executorId
+      withdraw.outcomeBlockHash = outcome.blockHash.toBase58()
+
+      // Log parsing
+      if(outcome.logs != null && outcome.logs.length > 0){
+        
+        let splitString = outcome.logs[0].split(':').join('').split(' ')
+        let splitString1 = outcome.logs[1].split(' ')
+        let splitString2 = outcome.logs[2].split(',').join(' ').split(' ')
+
+        if(outcome.logs.length <= 5){
+          withdraw.token = BigInt.fromString(splitString[1])
+          withdraw.amount = BigInt.fromString(splitString[3])
+          withdraw.currentTime = BigInt.fromString(splitString1[3])
+          withdraw.currentSysTime = BigInt.fromString(splitString2[6])
+          withdraw.totalCoin = BigInt.fromString(splitString2[8])
+
+
+          withdraw.save()
+        }
+        else if (outcome.logs.length == 7){  //https://explorer.near.org/transactions/9d61j3T7RqFg9hFifVSfTfi14jLtyv5AAems9HwmKdqF#3GqdJybZpywcSV7fkcf8Cy2F8gyFyX4GA95ntkEwKfdJ
+          withdraw.token = BigInt.fromString(splitString[1])
+          withdraw.amount = BigInt.fromString(splitString[3])
+          withdraw.currentTime = BigInt.fromString(splitString1[3])
+
+          withdraw.save()
+        }
+      } 
+
   } else {
     log.info("Not processed - FunctionCall is: {}", [functionCall.methodName]);
   }
