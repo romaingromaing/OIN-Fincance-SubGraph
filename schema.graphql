@@ -172,6 +172,12 @@ type WithdrawToken @entity {
   totalUnpaidStableFee: BigInt
   userUnpaidStableFee: BigInt
   index: BigInt
+  tokenReward: String
+  totalReward:BigInt
+  rewardSpeed: BigInt
+  rewardIndex: BigInt
+  doubleScale: BigInt
+  userReward:BigInt
   
 }
 

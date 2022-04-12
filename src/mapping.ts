@@ -468,22 +468,61 @@ function handleAction(
         
         let splitString = outcome.logs[0].split(':').join('').split(' ')
         let splitString1 = outcome.logs[1].split(' ')
-        let splitString2 = outcome.logs[2].split(',').join(' ').split(' ')
+        let splitString2 = outcome.logs[2].split(',').join(' ').split('"').join('').split(' ')
+        let splitString3 = outcome.logs[3].split(',').join(' ').split(' ')
 
-        if(outcome.logs.length <= 5){
-          withdraw.token = BigInt.fromString(splitString[1])
-          withdraw.amount = BigInt.fromString(splitString[3])
-          withdraw.currentTime = BigInt.fromString(splitString1[3])
-          withdraw.currentSysTime = BigInt.fromString(splitString2[6])
-          withdraw.totalCoin = BigInt.fromString(splitString2[8])
+        if(outcome.logs.length <= 5){ 
+          if(splitString3[0] == 'Current'){ // 2 versions https://explorer.near.org/transactions/4QpsnoXWFwdz5FddLQeWDmoxeQvuPY9RzKEyxVDivASp  https://explorer.near.org/transactions/d53Kb9uwkoeKD9ULXQN4aMpeoQNbfrE94BULNwircCr
+          
+            withdraw.token = BigInt.fromString(splitString[1])
+            withdraw.amount = BigInt.fromString(splitString[3])
+            withdraw.currentTime = BigInt.fromString(splitString1[3])
+            withdraw.currentSysTime = BigInt.fromString(splitString2[6])
+            withdraw.totalCoin = BigInt.fromString(splitString2[8])
+            withdraw.systemIndex= BigInt.fromString(splitString2[11])
+            withdraw.totalUnpaidStableFee = BigInt.fromString(splitString2[14])
+            withdraw.userUnpaidStableFee = BigInt.fromString(splitString3[5])
+            withdraw.index = BigInt.fromString(splitString3[8])
+
+            withdraw.save()
+          }
+          else{  //https://explorer.near.org/transactions/Er2qQAK5jEDxx7iTczpn9Wq6NqFzZqXaLB98LQFeZuLk#E4WAECaMGmAtVkx9p93KxtA83EJD4qHepYRd5x43J4qu
+            let splitString4 = outcome.logs[4].split(',').join(' ').split(' ')
+            withdraw.token = BigInt.fromString(splitString[1])
+            withdraw.amount = BigInt.fromString(splitString[3])
+            withdraw.currentTime = BigInt.fromString(splitString1[3])
+            withdraw.userReward = BigInt.fromString(splitString2[8])
+            withdraw.rewardIndex = BigInt.fromString(splitString2[11])
+            withdraw.currentSysTime = BigInt.fromString(splitString3[6])
+            withdraw.totalCoin = BigInt.fromString(splitString3[8])
+            withdraw.systemIndex= BigInt.fromString(splitString3[11])
+            withdraw.totalUnpaidStableFee = BigInt.fromString(splitString3[14])
+            withdraw.userUnpaidStableFee = BigInt.fromString(splitString4[5])
+            withdraw.index = BigInt.fromString(splitString4[8])
 
 
-          withdraw.save()
+            withdraw.save()
+          }
         }
         else if (outcome.logs.length == 7){  //https://explorer.near.org/transactions/9d61j3T7RqFg9hFifVSfTfi14jLtyv5AAems9HwmKdqF#3GqdJybZpywcSV7fkcf8Cy2F8gyFyX4GA95ntkEwKfdJ
+          let splitString4 = outcome.logs[4].split(',').join(' ').split(' ')
+          let splitString5 = outcome.logs[5].split(',').join(' ').split(' ')
+          
           withdraw.token = BigInt.fromString(splitString[1])
           withdraw.amount = BigInt.fromString(splitString[3])
-          withdraw.currentTime = BigInt.fromString(splitString1[3])
+          withdraw.currentTime = BigInt.fromString(splitString1[3]) // need to finish what is in the mid of these logs 
+          withdraw.tokenReward = splitString2[9].toString()
+          withdraw.totalReward = BigInt.fromString(splitString2[12])
+          withdraw.rewardSpeed = BigInt.fromString(splitString2[15])
+          withdraw.rewardIndex = BigInt.fromString(splitString2[18])
+          withdraw.doubleScale = BigInt.fromString(splitString2[21])
+          withdraw.userReward = BigInt.fromString(splitString3[8])
+          withdraw.currentSysTime = BigInt.fromString(splitString4[6])
+          withdraw.totalCoin = BigInt.fromString(splitString4[8])
+          withdraw.systemIndex= BigInt.fromString(splitString4[11])
+          withdraw.totalUnpaidStableFee = BigInt.fromString(splitString4[14])
+          withdraw.userUnpaidStableFee = BigInt.fromString(splitString5[5])
+          withdraw.index = BigInt.fromString(splitString5[8])
 
           withdraw.save()
         }
