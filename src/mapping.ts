@@ -1,5 +1,5 @@
 import { near, log, BigInt, json, JSONValueKind } from "@graphprotocol/graph-ts"
-import {  AfterWithdrawToken, BurnCoin, FtTransfer, FtTransferCall, MintCoin, OnMintTransfer, Poke, RegisterAccount, WithdrawToken } from "../generated/schema" // ensure to add any entities you define in schema.graphql
+import {  AfterWithdrawToken, BurnCoin, ClaimReward, FtTransfer, FtTransferCall, MintCoin, OnClaimDisReward, OnClaimMinReward, OnMintTransfer, Poke, RegisterAccount, WithdrawToken } from "../generated/schema" // ensure to add any entities you define in schema.graphql
 
 export function handleReceipt(receipt: near.ReceiptWithOutcome): void {
   const actions = receipt.receipt.actions;
@@ -510,7 +510,7 @@ function handleAction(
           
           withdraw.token = BigInt.fromString(splitString[1])
           withdraw.amount = BigInt.fromString(splitString[3])
-          withdraw.currentTime = BigInt.fromString(splitString1[3]) // need to finish what is in the mid of these logs 
+          withdraw.currentTime = BigInt.fromString(splitString1[3])
           withdraw.tokenReward = splitString2[9].toString()
           withdraw.totalReward = BigInt.fromString(splitString2[12])
           withdraw.rewardSpeed = BigInt.fromString(splitString2[15])
@@ -526,6 +526,129 @@ function handleAction(
 
           withdraw.save()
         }
+      } 
+
+  } else {
+    log.info("Not processed - FunctionCall is: {}", [functionCall.methodName]);
+  }
+
+  if (functionCall.methodName == "claim_reward") {
+    const receiptId = receipt.id.toBase58()
+
+      // Maps the JSON formatted log to the LOG entity
+      let claim = new ClaimReward(`${receiptId}`)
+
+      // Standard receipt properties - likely do not need to change
+      claim.blockTime = BigInt.fromU64(blockHeader.timestampNanosec/1000000)
+      claim.blockHeight = BigInt.fromU64(blockHeader.height)
+      claim.blockHash = blockHeader.hash.toBase58()
+      claim.predecessorId = receipt.predecessorId
+      claim.receiverId = receipt.receiverId
+      claim.signerId = receipt.signerId
+      claim.signerPublicKey = publicKey.bytes.toBase58()
+      claim.gasBurned = BigInt.fromU64(outcome.gasBurnt)
+      claim.tokensBurned = outcome.tokensBurnt
+      claim.outcomeId = outcome.id.toBase58()
+      claim.executorId = outcome.executorId
+      claim.outcomeBlockHash = outcome.blockHash.toBase58()
+
+      // Log parsing
+      if(outcome.logs != null && outcome.logs.length > 0){
+        let splitString = outcome.logs[0].split(' ')
+        
+        if(outcome.logs.length == 2){ // https://explorer.near.org/transactions/FMhiLEDLwiihPMb6DvfraC8dHiznjgRgrev3iWHLNwX5
+          let splitString1 = outcome.logs[1].split(' ')
+          
+          claim.currentTime = BigInt.fromString(splitString[3])
+          claim.accountId = splitString1[0].toString()
+          claim.tokenClaimed = splitString1[2].toString()
+          claim.rewardClaimed = BigInt.fromString(splitString1[4])
+          
+
+          claim.save()
+        }
+       
+        else if (outcome.logs.length == 3){ //https://explorer.near.org/transactions/8cvvqNQGN7hm6prFfC9ekztRBNQRX1pC385V1zgPf9fo
+          let splitString1 = outcome.logs[1].split(',').join('').split(' ')
+          let splitString2 = outcome.logs[2].split(' ')
+          
+          claim.currentTime = BigInt.fromString(splitString[3])
+          claim.index = BigInt.fromString(splitString1[10])
+          claim.accountId = splitString2[0].toString()
+          claim.tokenClaimed = splitString2[2].toString()
+          claim.rewardClaimed = BigInt.fromString(splitString2[4])
+
+          claim.save()
+        }
+      } 
+
+  } else {
+    log.info("Not processed - FunctionCall is: {}", [functionCall.methodName]);
+  }
+
+  if (functionCall.methodName == "on_claim_min_reward") {
+    const receiptId = receipt.id.toBase58()
+
+      // Maps the JSON formatted log to the LOG entity
+      let claim = new OnClaimMinReward(`${receiptId}`)
+
+      // Standard receipt properties - likely do not need to change
+      claim.blockTime = BigInt.fromU64(blockHeader.timestampNanosec/1000000)
+      claim.blockHeight = BigInt.fromU64(blockHeader.height)
+      claim.blockHash = blockHeader.hash.toBase58()
+      claim.predecessorId = receipt.predecessorId
+      claim.receiverId = receipt.receiverId
+      claim.signerId = receipt.signerId
+      claim.signerPublicKey = publicKey.bytes.toBase58()
+      claim.gasBurned = BigInt.fromU64(outcome.gasBurnt)
+      claim.tokensBurned = outcome.tokensBurnt
+      claim.outcomeId = outcome.id.toBase58()
+      claim.executorId = outcome.executorId
+      claim.outcomeBlockHash = outcome.blockHash.toBase58()
+
+      // Log parsing
+      if(outcome.logs != null && outcome.logs.length > 0){ //https://explorer.near.org/transactions/31T3Y912cC6DuwwFgxo9fjXqHngXZ7Qpgds3qWT1SsxM
+        let splitString = outcome.logs[0].split(' ')
+        let splitString1 = outcome.logs[1].split('"').join('').split('(').join(' ').split(')').join('').split(' ')
+
+        claim.accountId = splitString1[0].toString()
+        claim.tokenToClaim = BigInt.fromString(splitString1[3])
+    
+        claim.save()
+      } 
+
+  } else {
+    log.info("Not processed - FunctionCall is: {}", [functionCall.methodName]);
+  }
+
+  if (functionCall.methodName == "on_claim_dis_reward") {
+    const receiptId = receipt.id.toBase58()
+
+      // Maps the JSON formatted log to the LOG entity
+      let claim = new OnClaimDisReward(`${receiptId}`)
+
+      // Standard receipt properties - likely do not need to change
+      claim.blockTime = BigInt.fromU64(blockHeader.timestampNanosec/1000000)
+      claim.blockHeight = BigInt.fromU64(blockHeader.height)
+      claim.blockHash = blockHeader.hash.toBase58()
+      claim.predecessorId = receipt.predecessorId
+      claim.receiverId = receipt.receiverId
+      claim.signerId = receipt.signerId
+      claim.signerPublicKey = publicKey.bytes.toBase58()
+      claim.gasBurned = BigInt.fromU64(outcome.gasBurnt)
+      claim.tokensBurned = outcome.tokensBurnt
+      claim.outcomeId = outcome.id.toBase58()
+      claim.executorId = outcome.executorId
+      claim.outcomeBlockHash = outcome.blockHash.toBase58()
+
+      // Log parsing
+      if(outcome.logs != null && outcome.logs.length > 0){ //https://explorer.near.org/transactions/31T3Y912cC6DuwwFgxo9fjXqHngXZ7Qpgds3qWT1SsxM
+        let splitString = outcome.logs[0].split(',').join(' ').split('"').join('').split('(').join(' ').split(')').join('').split(' ')
+
+        claim.accountId = splitString[3].toString()
+        claim.depositorNearGain = BigInt.fromString(splitString[6])
+    
+        claim.save()
       } 
 
   } else {

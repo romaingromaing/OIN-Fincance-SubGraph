@@ -259,9 +259,8 @@ type OnClaimMinReward @entity {
   log: String
   # above here are standard field properties, add custom ones below
   accountId: String
-  did: String
-  registered: BigInt
-  owner: String
+  tokenToClaim: BigInt
+
 }
 
 type OnClaimDisReward @entity {
@@ -281,9 +280,7 @@ type OnClaimDisReward @entity {
   log: String
   # above here are standard field properties, add custom ones below
   accountId: String
-  did: String
-  registered: BigInt
-  owner: String
+  depositorNearGain: BigInt
 }
 
 type ClaimReward @entity {
@@ -302,10 +299,11 @@ type ClaimReward @entity {
   outcomeBlockHash: String
   log: String
   # above here are standard field properties, add custom ones below
+  currentTime: BigInt
+  rewardClaimed: BigInt
+  index: BigInt
   accountId: String
-  did: String
-  registered: BigInt
-  owner: String
+  tokenClaimed: String
 }
 
 type WithdrawFromSp @entity {
