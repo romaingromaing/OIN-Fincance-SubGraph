@@ -568,17 +568,31 @@ function handleAction(
           claim.save()
         }
        
-        else if (outcome.logs.length == 3){ //https://explorer.near.org/transactions/8cvvqNQGN7hm6prFfC9ekztRBNQRX1pC385V1zgPf9fo
-          let splitString1 = outcome.logs[1].split(',').join('').split(' ')
+        else if (outcome.logs.length == 3){ 
+          let splitString1 = outcome.logs[1].split(',').join('').split('"').join('').split(' ')
           let splitString2 = outcome.logs[2].split(' ')
-          
-          claim.currentTime = BigInt.fromString(splitString[3])
-          claim.index = BigInt.fromString(splitString1[10])
-          claim.accountId = splitString2[0].toString()
-          claim.tokenClaimed = splitString2[2].toString()
-          claim.rewardClaimed = BigInt.fromString(splitString2[4])
 
-          claim.save()
+          if (splitString1[0] == "Update"){ //https://explorer.near.org/transactions/8cvvqNQGN7hm6prFfC9ekztRBNQRX1pC385V1zgPf9fo
+            claim.currentTime = BigInt.fromString(splitString[3])
+            claim.index = BigInt.fromString(splitString1[10])
+            claim.accountId = splitString2[0].toString()
+            claim.tokenClaimed = splitString2[2].toString()
+            claim.rewardClaimed = BigInt.fromString(splitString2[4])
+
+            claim.save()
+          }
+          else {  //https://explorer.near.org/transactions/8QtJdForNRu62Eq2pbtFSTjqv8CFHUbZzjX6kHwaVnFh#DvB1p67J5NBagDhU3gt2Q2b72WKqMso2q4wYuAYqHgDn
+            claim.currentTime = BigInt.fromString(splitString[3])
+            claim.totalReward = BigInt.fromString(splitString1[11])
+            claim.rewardSpeed = BigInt.fromString(splitString1[13])
+            claim.index = BigInt.fromString(splitString1[15])
+            claim.doubleScale = BigInt.fromString(splitString1[17])
+            claim.accountId = splitString2[0].toString()
+            claim.tokenClaimed = splitString2[2].toString()
+            claim.rewardClaimed = BigInt.fromString(splitString2[4])
+
+            claim.save()
+          } 
         }
       } 
 
@@ -608,13 +622,27 @@ function handleAction(
 
       // Log parsing
       if(outcome.logs != null && outcome.logs.length > 0){ //https://explorer.near.org/transactions/31T3Y912cC6DuwwFgxo9fjXqHngXZ7Qpgds3qWT1SsxM
-        let splitString = outcome.logs[0].split(' ')
-        let splitString1 = outcome.logs[1].split('"').join('').split('(').join(' ').split(')').join('').split(' ')
+        
 
-        claim.accountId = splitString1[0].toString()
-        claim.tokenToClaim = BigInt.fromString(splitString1[3])
+        if (outcome.logs.length == 2){
+          let splitString = outcome.logs[0].split(' ')
+          let splitString1 = outcome.logs[1].split('"').join('').split('(').join(' ').split(')').join('').split(' ')
+
+          claim.accountId = splitString1[0].toString()
+          claim.tokenToClaim = BigInt.fromString(splitString1[3])
+          claim.transferState = splitString[1].toString()
     
-        claim.save()
+          claim.save()
+        }
+        else if(outcome.logs.length == 1){
+          let splitString = outcome.logs[0].split('"').join('').split('(').join(' ').split(')').join('').split(' ')
+
+          claim.accountId = splitString[0].toString()
+          claim.tokenToClaim = BigInt.fromString(splitString[4])
+          claim.transferState = splitString[6].toString()
+
+          claim.save()
+        }
       } 
 
   } else {

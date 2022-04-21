@@ -260,7 +260,7 @@ type OnClaimMinReward @entity {
   # above here are standard field properties, add custom ones below
   accountId: String
   tokenToClaim: BigInt
-
+  transferState: String
 }
 
 type OnClaimDisReward @entity {
@@ -304,6 +304,9 @@ type ClaimReward @entity {
   index: BigInt
   accountId: String
   tokenClaimed: String
+  totalReward: BigInt
+  rewardSpeed: BigInt
+  doubleScale: BigInt
 }
 
 type WithdrawFromSp @entity {
